@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Activity, LayoutDashboard, Users, Calendar, LogOut, Search as SearchIcon, FileText, ChevronRight, X } from 'lucide-react';
+import { Activity, LayoutDashboard, Users, Calendar, LogOut, Search as SearchIcon, FileText, ChevronRight, X, Menu } from 'lucide-react';
 
 export default function DoctorDashboard() {
     const navigate = useNavigate();
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [activeTab, setActiveTab] = useState('dashboard');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const patients = [
         { id: "PX-88293", name: "Vansh Dixit", age: 35, condition: "Post-COVID Monitoring", lastVisit: "2 days ago", risk: "Low", weight: "75 kg", height: "178 cm", bloodType: "O+", allergies: "None", history: [{ condition: "TB", date: "Feb 10, 2001", duration: "6 months" }, { condition: "Fracture", date: "June 22, 2012", duration: "8 weeks" }, { condition: "COVID", date: "Mar 15, 2024", duration: "2 weeks" }] },
@@ -23,17 +24,31 @@ export default function DoctorDashboard() {
 
     return (
         <div className="min-h-screen bg-neutral-50 flex">
+            {/* Mobile Sidebar Overlay */}
+            {isSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-30 md:hidden"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
-            <aside className="w-64 bg-white border-r border-neutral-200 fixed h-full z-10 hidden md:flex flex-col">
-                <div className="p-6 border-b border-neutral-100 flex items-center gap-2 text-indigo-600">
-                    <Activity className="w-6 h-6" />
-                    <span className="font-serif text-lg font-medium text-neutral-900">PulseX Doctor</span>
+            <aside className={`w-64 bg-white border-r border-neutral-200 fixed h-full z-40 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="p-6 border-b border-neutral-100 flex items-center justify-between text-indigo-600">
+                    <div className="flex items-center gap-2">
+                        <Activity className="w-6 h-6" />
+                        <span className="font-serif text-lg font-medium text-neutral-900">PulseX Doctor</span>
+                    </div>
+                    {/* Close button for mobile */}
+                    <button className="md:hidden text-neutral-500 hover:text-neutral-900" onClick={() => setIsSidebarOpen(false)}>
+                        <X className="w-5 h-5" />
+                    </button>
                 </div>
 
-                <nav className="p-4 flex-1 space-y-1">
-                    <SidebarItem icon={<LayoutDashboard />} label="Dashboard" active={activeTab === 'dashboard' && !selectedPatient} onClick={() => { setActiveTab('dashboard'); setSelectedPatient(null); }} />
-                    <SidebarItem icon={<Users />} label="My Patients" active={activeTab === 'patients' && !selectedPatient} onClick={() => { setActiveTab('patients'); setSelectedPatient(null); }} />
-                    <SidebarItem icon={<Calendar />} label="Appointments" active={activeTab === 'appointments' && !selectedPatient} onClick={() => { setActiveTab('appointments'); setSelectedPatient(null); }} />
+                <nav className="p-4 flex-1 space-y-1 overflow-y-auto">
+                    <SidebarItem icon={<LayoutDashboard />} label="Dashboard" active={activeTab === 'dashboard' && !selectedPatient} onClick={() => { setActiveTab('dashboard'); setSelectedPatient(null); setIsSidebarOpen(false); }} />
+                    <SidebarItem icon={<Users />} label="My Patients" active={activeTab === 'patients' && !selectedPatient} onClick={() => { setActiveTab('patients'); setSelectedPatient(null); setIsSidebarOpen(false); }} />
+                    <SidebarItem icon={<Calendar />} label="Appointments" active={activeTab === 'appointments' && !selectedPatient} onClick={() => { setActiveTab('appointments'); setSelectedPatient(null); setIsSidebarOpen(false); }} />
                 </nav>
 
                 <div className="p-4 border-t border-neutral-100">
@@ -42,23 +57,28 @@ export default function DoctorDashboard() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 md:ml-64 p-8">
-                <header className="flex justify-between items-center mb-8">
-                    <div>
-                        <h1 className="text-2xl font-serif text-neutral-900">Dr. Sharma's Portal</h1>
-                        <p className="text-xs text-neutral-500">Cardiology • License #MD-9982</p>
+            <main className="flex-1 md:ml-64 p-4 md:p-8 w-full transition-all duration-300">
+                <header className="flex justify-between items-center mb-8 gap-4">
+                    <div className="flex items-center gap-4">
+                        <button className="md:hidden p-2 text-neutral-600 hover:bg-neutral-100 rounded-lg" onClick={() => setIsSidebarOpen(true)}>
+                            <Menu className="w-6 h-6" />
+                        </button>
+                        <div>
+                            <h1 className="text-xl md:text-2xl font-serif text-neutral-900">Dr. Sharma's Portal</h1>
+                            <p className="text-xs text-neutral-500">Cardiology • License #MD-9982</p>
+                        </div>
                     </div>
-                    <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-200">
+                    <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-200 shrink-0">
                         SM
                     </div>
                 </header>
 
                 {selectedPatient ? (
-                    <div className="animate-fade-in">
+                    <div className="animate-fade-in w-full max-w-[100vw] overflow-x-hidden">
                         <PatientDetailView patient={selectedPatient} onBack={() => setSelectedPatient(null)} />
                     </div>
                 ) : (
-                    <div key={activeTab} className="animate-fade-in">
+                    <div key={activeTab} className="animate-fade-in w-full max-w-[100vw] overflow-x-hidden">
                         {activeTab === 'dashboard' && <PatientListView patients={patients.slice(0, 3)} onSelect={setSelectedPatient} title="Recent Patients" />}
                         {activeTab === 'patients' && <PatientListView patients={patients} onSelect={setSelectedPatient} title="All Patients Directory" />}
                         {activeTab === 'appointments' && <AppointmentsView appointments={appointments} />}
@@ -85,46 +105,48 @@ function SidebarItem({ icon, label, active, onClick }) {
 function PatientListView({ patients, onSelect, title }) {
     return (
         <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-neutral-100 flex justify-between items-center">
+            <div className="p-6 border-b border-neutral-100 flex justify-between items-center flex-wrap gap-4">
                 <h3 className="font-semibold text-neutral-900">{title}</h3>
-                <div className="relative">
+                <div className="relative w-full md:w-auto">
                     <SearchIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
-                    <input placeholder="Search records..." className="pl-9 pr-4 py-2 border border-neutral-200 rounded-lg text-xs outline-none focus:border-indigo-500" />
+                    <input placeholder="Search records..." className="w-full md:w-auto pl-9 pr-4 py-2 border border-neutral-200 rounded-lg text-xs outline-none focus:border-indigo-500" />
                 </div>
             </div>
-            <table className="w-full text-left">
-                <thead className="bg-neutral-50 text-xs font-semibold text-neutral-500 uppercase tracking-wider">
-                    <tr>
-                        <th className="px-6 py-4">Patient Name</th>
-                        <th className="px-6 py-4">ID</th>
-                        <th className="px-6 py-4">Condition</th>
-                        <th className="px-6 py-4">Risk Profile</th>
-                        <th className="px-6 py-4">Action</th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-neutral-100">
-                    {patients.map((p, i) => (
-                        <tr key={i} className="hover:bg-neutral-50 transition-colors">
-                            <td className="px-6 py-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold text-neutral-600">{p.name.split(' ')[0][0]}{p.name.split(' ')[1][0]}</div>
-                                    <span className="text-sm font-medium text-neutral-900">{p.name}</span>
-                                </div>
-                            </td>
-                            <td className="px-6 py-4 text-xs text-neutral-500">{p.id}</td>
-                            <td className="px-6 py-4 text-xs text-neutral-700">{p.condition}</td>
-                            <td className="px-6 py-4">
-                                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${p.risk === 'Low' ? 'bg-green-100 text-green-700' : p.risk === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
-                                    {p.risk} Risk
-                                </span>
-                            </td>
-                            <td className="px-6 py-4">
-                                <button onClick={() => onSelect(p)} className="text-indigo-600 hover:text-indigo-800 text-xs font-semibold">View Record</button>
-                            </td>
+            <div className="overflow-x-auto">
+                <table className="w-full text-left whitespace-nowrap">
+                    <thead className="bg-neutral-50 text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                        <tr>
+                            <th className="px-6 py-4">Patient Name</th>
+                            <th className="px-6 py-4">ID</th>
+                            <th className="px-6 py-4">Condition</th>
+                            <th className="px-6 py-4">Risk Profile</th>
+                            <th className="px-6 py-4">Action</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody className="divide-y divide-neutral-100">
+                        {patients.map((p, i) => (
+                            <tr key={i} className="hover:bg-neutral-50 transition-colors">
+                                <td className="px-6 py-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold text-neutral-600">{p.name.split(' ')[0][0]}{p.name.split(' ')[1][0]}</div>
+                                        <span className="text-sm font-medium text-neutral-900">{p.name}</span>
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4 text-xs text-neutral-500">{p.id}</td>
+                                <td className="px-6 py-4 text-xs text-neutral-700">{p.condition}</td>
+                                <td className="px-6 py-4">
+                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${p.risk === 'Low' ? 'bg-green-100 text-green-700' : p.risk === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
+                                        {p.risk} Risk
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                    <button onClick={() => onSelect(p)} className="text-indigo-600 hover:text-indigo-800 text-xs font-semibold">View Record</button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }
@@ -137,9 +159,9 @@ function PatientDetailView({ patient, onBack }) {
             </button>
 
             <div className="bg-white p-6 rounded-2xl border border-neutral-100 shadow-sm">
-                <div className="flex justify-between items-start mb-6">
+                <div className="flex flex-col md:flex-row justify-between items-start mb-6 gap-4">
                     <div className="flex gap-4">
-                        <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center text-xl font-bold text-neutral-500">
+                        <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center text-xl font-bold text-neutral-500 shrink-0">
                             {patient.name.split(' ')[0][0]}{patient.name.split(' ')[1][0]}
                         </div>
                         <div>
@@ -210,35 +232,37 @@ function AppointmentsView({ appointments }) {
                 <h3 className="font-semibold text-neutral-900">Today's Schedule</h3>
                 <button className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100">+ New Appointment</button>
             </div>
-            <table className="w-full text-left">
-                <thead className="bg-neutral-50 text-xs font-semibold text-neutral-500 uppercase tracking-wider">
-                    <tr>
-                        <th className="px-6 py-4">Time</th>
-                        <th className="px-6 py-4">Patient Name</th>
-                        <th className="px-6 py-4">Type</th>
-                        <th className="px-6 py-4">Status</th>
-                        <th className="px-6 py-4">Action</th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-neutral-100">
-                    {appointments.map((appt, i) => (
-                        <tr key={i} className="hover:bg-neutral-50 transition-colors">
-                            <td className="px-6 py-4 font-semibold text-neutral-900 text-sm">{appt.time}</td>
-                            <td className="px-6 py-4 text-sm text-neutral-700">{appt.patient}</td>
-                            <td className="px-6 py-4 text-xs text-neutral-500">{appt.type}</td>
-                            <td className="px-6 py-4">
-                                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${appt.status === 'Upcoming' ? 'bg-indigo-100 text-indigo-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                    {appt.status}
-                                </span>
-                            </td>
-                            <td className="px-6 py-4">
-                                <button className="text-neutral-400 hover:text-indigo-600 mr-3"><FileText className="w-4 h-4" /></button>
-                                <button className="text-neutral-400 hover:text-red-600"><X className="w-4 h-4" /></button>
-                            </td>
+            <div className="overflow-x-auto">
+                <table className="w-full text-left whitespace-nowrap">
+                    <thead className="bg-neutral-50 text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                        <tr>
+                            <th className="px-6 py-4">Time</th>
+                            <th className="px-6 py-4">Patient Name</th>
+                            <th className="px-6 py-4">Type</th>
+                            <th className="px-6 py-4">Status</th>
+                            <th className="px-6 py-4">Action</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody className="divide-y divide-neutral-100">
+                        {appointments.map((appt, i) => (
+                            <tr key={i} className="hover:bg-neutral-50 transition-colors">
+                                <td className="px-6 py-4 font-semibold text-neutral-900 text-sm">{appt.time}</td>
+                                <td className="px-6 py-4 text-sm text-neutral-700">{appt.patient}</td>
+                                <td className="px-6 py-4 text-xs text-neutral-500">{appt.type}</td>
+                                <td className="px-6 py-4">
+                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${appt.status === 'Upcoming' ? 'bg-indigo-100 text-indigo-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                        {appt.status}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                    <button className="text-neutral-400 hover:text-indigo-600 mr-3"><FileText className="w-4 h-4" /></button>
+                                    <button className="text-neutral-400 hover:text-red-600"><X className="w-4 h-4" /></button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

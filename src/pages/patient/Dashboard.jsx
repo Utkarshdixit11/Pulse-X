@@ -1,27 +1,42 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Activity, LayoutDashboard, History, FileText, Settings, LogOut, ChevronRight, Stethoscope, Star, Download as DownloadIcon, Brain, Clock, BrainCircuit, Search as SearchIcon, Dna, Pill } from 'lucide-react';
+import { Activity, LayoutDashboard, History, FileText, Settings, LogOut, ChevronRight, Stethoscope, Star, Download as DownloadIcon, Brain, Clock, BrainCircuit, Search as SearchIcon, Dna, Pill, Menu, X } from 'lucide-react';
 
 export default function PatientDashboard() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('timeline');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
         <div className="min-h-screen bg-neutral-50 flex">
+            {/* Mobile Sidebar Overlay */}
+            {isSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-30 md:hidden"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
-            <aside className="w-64 bg-white border-r border-neutral-200 fixed h-full z-10 hidden md:flex flex-col">
-                <div className="p-6 border-b border-neutral-100 flex items-center gap-2 text-indigo-600">
-                    <Activity className="w-6 h-6" />
-                    <span className="font-serif text-lg font-medium text-neutral-900">PulseX</span>
+            <aside className={`w-64 bg-white border-r border-neutral-200 fixed h-full z-40 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="p-6 border-b border-neutral-100 flex items-center justify-between text-indigo-600">
+                    <div className="flex items-center gap-2">
+                        <Activity className="w-6 h-6" />
+                        <span className="font-serif text-lg font-medium text-neutral-900">PulseX</span>
+                    </div>
+                    {/* Close button for mobile */}
+                    <button className="md:hidden text-neutral-500 hover:text-neutral-900" onClick={() => setIsSidebarOpen(false)}>
+                        <X className="w-5 h-5" />
+                    </button>
                 </div>
 
-                <nav className="p-4 flex-1 space-y-1">
-                    <SidebarItem icon={<LayoutDashboard />} label="Overview" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
-                    <SidebarItem icon={<Clock />} label="My Timeline" active={activeTab === 'timeline'} onClick={() => setActiveTab('timeline')} />
-                    <SidebarItem icon={<BrainCircuit />} label="AI Report" active={activeTab === 'ai-report'} onClick={() => setActiveTab('ai-report')} />
-                    <SidebarItem icon={<Dna />} label="Genetic Map" active={activeTab === 'genetic-map'} onClick={() => setActiveTab('genetic-map')} />
-                    <SidebarItem icon={<Pill />} label="Smart Cabinet" active={activeTab === 'smart-cabinet'} onClick={() => setActiveTab('smart-cabinet')} />
-                    <SidebarItem icon={<SearchIcon />} label="Find Doctor" active={activeTab === 'find-doctor'} onClick={() => setActiveTab('find-doctor')} />
+                <nav className="p-4 flex-1 space-y-1 overflow-y-auto">
+                    <SidebarItem icon={<LayoutDashboard />} label="Overview" active={activeTab === 'overview'} onClick={() => { setActiveTab('overview'); setIsSidebarOpen(false); }} />
+                    <SidebarItem icon={<Clock />} label="My Timeline" active={activeTab === 'timeline'} onClick={() => { setActiveTab('timeline'); setIsSidebarOpen(false); }} />
+                    <SidebarItem icon={<BrainCircuit />} label="AI Report" active={activeTab === 'ai-report'} onClick={() => { setActiveTab('ai-report'); setIsSidebarOpen(false); }} />
+                    <SidebarItem icon={<Dna />} label="Genetic Map" active={activeTab === 'genetic-map'} onClick={() => { setActiveTab('genetic-map'); setIsSidebarOpen(false); }} />
+                    <SidebarItem icon={<Pill />} label="Smart Cabinet" active={activeTab === 'smart-cabinet'} onClick={() => { setActiveTab('smart-cabinet'); setIsSidebarOpen(false); }} />
+                    <SidebarItem icon={<SearchIcon />} label="Find Doctor" active={activeTab === 'find-doctor'} onClick={() => { setActiveTab('find-doctor'); setIsSidebarOpen(false); }} />
                 </nav>
 
                 <div className="p-4 border-t border-neutral-100">
@@ -30,18 +45,23 @@ export default function PatientDashboard() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 md:ml-64 p-8">
-                <header className="flex justify-between items-center mb-8">
-                    <div>
-                        <h1 className="text-2xl font-serif text-neutral-900">Welcome back, Vansh</h1>
-                        <p className="text-xs text-neutral-500">Patient ID: PX-88293 • <span className="text-green-600">Premium Member</span></p>
+            <main className="flex-1 md:ml-64 p-4 md:p-8 w-full transition-all duration-300">
+                <header className="flex justify-between items-center mb-8 gap-4">
+                    <div className="flex items-center gap-4">
+                        <button className="md:hidden p-2 text-neutral-600 hover:bg-neutral-100 rounded-lg" onClick={() => setIsSidebarOpen(true)}>
+                            <Menu className="w-6 h-6" />
+                        </button>
+                        <div>
+                            <h1 className="text-xl md:text-2xl font-serif text-neutral-900">Welcome back, Vansh</h1>
+                            <p className="text-xs text-neutral-500">Patient ID: PX-88293 • <span className="text-green-600">Premium Member</span></p>
+                        </div>
                     </div>
-                    <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold border border-indigo-200">
+                    <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold border border-indigo-200 shrink-0">
                         VD
                     </div>
                 </header>
 
-                <div key={activeTab} className="animate-fade-in">
+                <div key={activeTab} className="animate-fade-in w-full max-w-[100vw] overflow-x-hidden">
                     {activeTab === 'timeline' && <TimelineView />}
                     {activeTab === 'ai-report' && <AiReportView />}
                     {activeTab === 'genetic-map' && <GeneticHistoryView />}
