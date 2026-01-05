@@ -20,10 +20,9 @@ export default function Hero() {
                         Track diseases from childhood to adulthood. Let AI analyze your history to predict future risks and optimize your routine.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center gap-4 animate-fade-in-up delay-200 mb-6">
-                        <a href="#download" className="w-full sm:w-auto px-8 py-4 bg-white text-neutral-950 rounded-full text-xs font-semibold hover:bg-neutral-200 transition-colors text-center shadow-lg shadow-white/5">Get Early Access</a>
-                        <a href="#features" className="w-full sm:w-auto px-8 py-4 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-white/90 text-xs font-semibold hover:bg-white/10 hover:text-white hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2 group shadow-lg shadow-black/10 hover:shadow-indigo-500/10">
+                        <button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="w-full sm:w-auto px-8 py-4 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-white/90 text-xs font-semibold hover:bg-white/10 hover:text-white hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2 group shadow-lg shadow-black/10 hover:shadow-indigo-500/10">
                             Explore Features <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-white/70 group-hover:text-white" />
-                        </a>
+                        </button>
                     </div>
 
                 </div>
