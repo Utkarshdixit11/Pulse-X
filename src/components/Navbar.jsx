@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, Menu, X, ChevronDown } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 
 
 export default function Navbar() {
@@ -22,14 +22,14 @@ export default function Navbar() {
             <div className={`absolute inset-0 transition-all duration-300 ${isScrolled ? 'bg-white/80 backdrop-blur-md border-b border-neutral-200 shadow-sm' : 'bg-transparent'}`}></div>
 
             <div className="relative flex h-20 max-w-7xl mx-auto px-6 items-center justify-between">
-                <a href="#" className="flex items-center gap-2 z-50 relative">
+                <Link to="/" className="flex items-center gap-2 z-50 relative">
                     <div className="w-8 h-8 transition-all duration-300 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
                         <Activity className="w-5 h-5" />
                     </div>
                     <span className={`font-serif text-lg tracking-tight font-medium transition-colors duration-300 ${isScrolled || isLoginPage ? 'text-neutral-900' : 'text-white'}`}>
                         PulseX
                     </span>
-                </a>
+                </Link>
 
                 {/* Desktop Menu */}
                 {!isLoginPage && (
@@ -81,7 +81,7 @@ export default function Navbar() {
 
                 {!isLoginPage && (
                     <div className="hidden lg:flex items-center gap-4 z-50">
-                        <a href="/login" className={`px-5 py-2 rounded-full text-xs font-semibold transition-colors shadow-lg ${isScrolled ? 'bg-neutral-900 text-white hover:bg-neutral-800 shadow-neutral-900/10' : 'bg-white text-neutral-950 hover:bg-neutral-200 shadow-white/5'}`}>Log In</a>
+                        <Link to="/login" className={`px-5 py-2 rounded-full text-xs font-semibold transition-colors shadow-lg ${isScrolled ? 'bg-neutral-900 text-white hover:bg-neutral-800 shadow-neutral-900/10' : 'bg-white text-neutral-950 hover:bg-neutral-200 shadow-white/5'}`}>Log In</Link>
                     </div>
                 )}
 
@@ -98,7 +98,7 @@ export default function Navbar() {
             {/* Mobile Menu */}
             <div className={`fixed inset-0 bg-neutral-950 z-40 flex flex-col pt-24 px-6 transition-all duration-300 lg:hidden overflow-y-auto ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
                 <div className="flex flex-col gap-6 pb-20">
-                    <a href="#" className="text-xl font-serif text-white border-b border-white/10 pb-4" onClick={() => setIsMobileMenuOpen(false)}>Home</a>
+                    <Link to="/" className="text-xl font-serif text-white border-b border-white/10 pb-4" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
                     <div className="flex flex-col gap-3">
                         <h3 className="text-xs font-bold uppercase tracking-widest text-indigo-400">App Features</h3>
                         <a href="#dual-portal" className="text-lg text-neutral-300 font-light" onClick={() => setIsMobileMenuOpen(false)}>Doctor & Patient View</a>
@@ -108,7 +108,7 @@ export default function Navbar() {
                     <div className="flex flex-col gap-3 mt-4">
                         <h3 className="text-xs font-bold uppercase tracking-widest text-indigo-400">Tools</h3>
                         <a href="#search" className="text-lg text-neutral-300 font-light" onClick={() => setIsMobileMenuOpen(false)}>Find a Doctor</a>
-                        <a href="/login" className="text-sm font-semibold text-white mt-2" onClick={() => setIsMobileMenuOpen(false)}>Log In →</a>
+                        <Link to="/login" className="text-sm font-semibold text-white mt-2" onClick={() => setIsMobileMenuOpen(false)}>Log In →</Link>
                     </div>
 
                 </div>
